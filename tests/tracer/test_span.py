@@ -627,3 +627,15 @@ def test_set_exc_info_with_unicode():
     if six.PY3:
         exception_span = get_exception_span(Exception("DataDog/水"))
         assert "DataDog/水" == exception_span.get_tag(ERROR_MSG)
+
+
+def test_resource_name_limits():
+    s = Span("op", resource="a" * 15001)
+    assert s.resource == "a" * 15000
+
+    s = Span("op")
+    s.resource = "a" * 15000
+    assert s.resource == "a" * 15000
+
+    s.resource = "a" * 15001
+    assert s.resource == "a" * 15000

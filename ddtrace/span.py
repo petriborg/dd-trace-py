@@ -26,6 +26,7 @@ from .constants import USER_KEEP
 from .constants import USER_REJECT
 from .constants import VERSION_KEY
 from .context import Context
+from .ext import _limits
 from .ext import http
 from .ext import net
 from .internal import _rand
@@ -114,17 +115,18 @@ class Span(object):
         :param on_finish: list of functions called when the span finishes.
         """
         # pre-conditions
-        if not (span_id is None or isinstance(span_id, six.integer_types)):
-            raise TypeError("span_id must be an integer")
-        if not (trace_id is None or isinstance(trace_id, six.integer_types)):
-            raise TypeError("trace_id must be an integer")
-        if not (parent_id is None or isinstance(parent_id, six.integer_types)):
-            raise TypeError("parent_id must be an integer")
+        # if not (span_id is None or isinstance(span_id, six.integer_types)):
+        #     raise TypeError("span_id must be an integer")
+        # if not (trace_id is None or isinstance(trace_id, six.integer_types)):
+        #     raise TypeError("trace_id must be an integer")
+        # if not (parent_id is None or isinstance(parent_id, six.integer_types)):
+        #     raise TypeError("parent_id must be an integer")
 
         # required span info
         self.name = name
         self.service = service
-        self._resource = [resource or name]
+        self._resource = [None]
+        self.resource = resource or name
         self.span_type = span_type
 
         # tags / metadata
@@ -189,10 +191,14 @@ class Span(object):
 
     @property
     def resource(self):
+        # type: () -> Optional[str]
         return self._resource[0]
 
     @resource.setter
     def resource(self, value):
+        # type: (Optional[str]) -> None
+        if value is not None and len(value) > _limits.RESOURCE_NAME_MAX_LEN:
+            value = value[0 : _limits.RESOURCE_NAME_MAX_LEN]
         self._resource[0] = value
 
     @property
