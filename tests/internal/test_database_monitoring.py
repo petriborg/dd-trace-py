@@ -36,7 +36,7 @@ def test_get_dbm_comment_disabled_mode():
 
     dbspan = tracer.trace("dbspan", service="orders-db")
     sqlcomment = _database_monitoring._get_dbm_comment(dbspan)
-    assert sqlcomment == ""
+    assert sqlcomment is None
 
 
 @pytest.mark.subprocess(

@@ -9,6 +9,8 @@ from . import _config as dd_config
 
 
 if TYPE_CHECKING:
+    from typing import Optional
+
     from ddtrace import Span
 
 DBM_PARENT_SERVICE_NAME_KEY = "ddps"
@@ -34,9 +36,9 @@ dbm_config = DatabaseMonitoringConfig()
 
 
 def _get_dbm_comment(db_span):
-    # type: (Span) -> str
+    # type: (Span) -> Optional[str]
     if dbm_config.injection_mode == "disabled":
-        return ""
+        return None
 
     dbm_tags = {
         DBM_PARENT_SERVICE_NAME_KEY: dd_config.service,
